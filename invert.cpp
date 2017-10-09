@@ -6,12 +6,14 @@
 #include <string>
 #include <iterator>
 #include <sstream>
+#include <algorithm>
 #include <math.h>
 #include <bitset>
 using namespace std;
 
 bitset<2> expr_2 (3);
-
+vector <int> var_order;
+int cunt = -1;
 
 bool Isnull (vector < bitset<2> > x)
     {
@@ -137,10 +139,13 @@ vector < vector < bitset<2> > > cofactor(vector < vector < bitset<2> > > pcn, in
         return pcn;
     }
 
-int binate_priority(vector < vector < bitset<2> > > pcn)
+void binate_priority(vector < vector < bitset<2> > > pcn)
     {
         vector <int> sum1, sum2;
-        int sum11, sum22;
+        int sum11=0, sum22=0;
+        int val, val2;
+        vector <int> index, subset;
+        vector <int>::iterator p,o;
         for(int j = 0; j < pcn[0].size(); j++)
         {
             for(int i = 0; i < pcn.size(); i++)
@@ -150,22 +155,51 @@ int binate_priority(vector < vector < bitset<2> > > pcn)
                     sum11 += 1;
                     sum22 += 1;
                 }
+
                 else if (pcn[i][j] == 01)
                 {
                     sum11 += 1;
                     sum22 -= 1;
                 }
-                sum1.push_back(sum11);
-                sum2.push_back(sum22);
-                sum11 = 0;
-                sum22 = 0;
+
             }
+            sum1.push_back(sum11);
+            sum2.push_back(abs(sum22));
+            sum11 = 0;
+            sum22 = 0;
         }
-        //Incomplete
+
+        val = *max_element(sum1.begin(), sum1.end());
+
+        while(val != 0)
+        {
+            p = find(sum1.begin(), sum1.end(), val);
+            //o = p;
+            while(p != sum1.end())
+            {
+                index.push_back(p - sum1.begin() + 1);
+                subset.push_back(sum2[p - sum1.begin()]);
+                *p = 0;
+                p = find(p+1, sum1.end(),val);
+            }
+
+            o = min_element(subset.begin(), subset.end());
+            while(subset.size()!=0)
+            {
+                var_order.push_back(index[o - subset.begin()]);
+                subset.erase(o);
+                index.erase(o - subset.begin() + index.begin());
+                o = min_element(subset.begin(), subset.end());
+            }
+            subset.clear();
+            index.clear();
+            val = *max_element(sum1.begin(), sum1.end());
+
+        }
 
     }
 
-vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn)
+vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, int depth = 0)
     {
         int lim = pcn[0].size();
 
@@ -176,6 +210,7 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn)
             vector <bitset <2> > b (lim,a);
             vector < vector < bitset<2> > > co (1,b);
             vector < vector < bitset<2> > > comp;
+            cunt = cunt - 1;
             for(int k = 0; k < lim; k++)
             {
                 if(pcn[0][k] == 01)
@@ -200,7 +235,7 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn)
 
         else
         {
-
+            return (OR(AND(complement(cofactor(pcn,var_order[depth]),depth+1), var_order[depth]), AND(complement(cofactor(pcn,-var_order[depth]), depth+1), -var_order[depth])));
         }
 
     }
@@ -212,14 +247,13 @@ int main()
     string s;
     int var,cube,lit,p,j;
     read.open("part1.pcn");
-
+    vector <int>::iterator o;
     getline(read,s);
     var = atoi(s.c_str());
 
     getline(read,s);
     cube = atoi(s.c_str());
-    bitset<2> a (1);
-    bitset<2> b (2);
+
     //vector <bool> expr_2 (2,1);
     vector < bitset<2> > expr_1 (var, expr_2);
     vector < vector < bitset<2> > > expr (cube, expr_1);
@@ -257,9 +291,35 @@ int main()
         }
         cout<<endl;
     }
-
-    //cout<<expr.size();
-
+    cout<<endl;
+    binate_priority(expr);
+    expr = complement(expr);
+    for(int l = 0; l < expr.size(); l++)
+    {
+        for(int k = 0; k < var; k++)
+        {
+            cout<<expr[l][k]<<" ";
+        }
+        cout<<endl;
+    }
+//    for(int h = 0; h<var_order.size(); h++)
+//    {
+//        cout<<var_order[h]<<endl;
+//    }
+//    cout<<index[0];
+//    vector <int> der;
+//    der.push_back(1);
+//    der.push_back(3);
+//    der.push_back(1);
+//    der.push_back(4);
+//
+//    o = min_element(der.begin(),der.end());
+//    while(o != der.end())
+//    {
+//        cout<<*o<<endl;
+//        o = min_element(o+1,der.end());
+//    }
+    //cout<<distance(der.begin(), max_element(der.begin(),der.end()-2));
     return 0;
 
 }
