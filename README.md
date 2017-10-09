@@ -1,9 +1,9 @@
 # VLSI-CAD-Espresso
 
 Reading the input file (*.pcn extension):
-1> First element - No of literals in SOP Boolean Expression
-2> Second element - No of cubes in SOP
-3> Third Element onwards:
+1> First line - No of literals in SOP Boolean Expression
+2> Second line - No of cubes in SOP
+3> Third line:
 	i> First number gives number of literals present in current cube
 	ii>The rest give the literal number and its sign in the cube
 
