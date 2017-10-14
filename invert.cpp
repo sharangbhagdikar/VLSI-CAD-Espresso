@@ -9,11 +9,13 @@
 #include <algorithm>
 #include <math.h>
 #include <bitset>
+
 using namespace std;
 
 bitset<2> expr_2 (3);
+bitset<2> expr_3 (0);
 vector <int> var_order;
-int cunt = -1;
+
 
 bool Isnull (vector < bitset<2> > x)
     {
@@ -206,11 +208,10 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
 
         if(pcn.size()==1)
         {
-            bitset<2> a (3);
-            vector <bitset <2> > b (lim,a);
+            vector <bitset <2> > b (lim,expr_2);
             vector < vector < bitset<2> > > co (1,b);
             vector < vector < bitset<2> > > comp;
-            cunt = cunt - 1;
+
             for(int k = 0; k < lim; k++)
             {
                 if(pcn[0][k] == 01)
@@ -225,10 +226,9 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
             return comp;
 
         }
-        else if(pcn.size()==0)
+        else if(pcn.empty())
         {
-            bitset<2> c (0);
-            vector <bitset <2> > d (lim,c);
+            vector <bitset <2> > d (lim,expr_3);
             vector < vector < bitset<2> > > co2 (1,d);
             return co2;
         }
@@ -238,6 +238,151 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
             return (OR(AND(complement(cofactor(pcn,var_order[depth]),depth+1), var_order[depth]), AND(complement(cofactor(pcn,-var_order[depth]), depth+1), -var_order[depth])));
         }
 
+    }
+
+    vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > comp)
+    {
+        int lim = pcn[0].size();
+        int dist = 0;
+        vector< bitset <2> > d1 (lim, expr_2);
+        //vector< bitset <2> > reset (d1);
+        vector <int> v(10);
+        //vector <int> sum1 (lim, 0);
+        //vector < vector <int> > sum (1, sum1);
+        //sum1.clear();
+        vector <int> sum;
+        vector <pair <int, vector<int> > > sumb (lim , make_pair(0,sum));
+        // Find a way to get around this
+        vector <pair <int, vector<int> > > reset (sumb);
+        vector <pair <int, vector<int> > > :: iterator it;
+        vector <int> :: iterator itv,it2;
+        // Try both methods
+        //vector <pair <int, vector<int> > > sumb;
+        //vector <pair <int, vector<int> > >::iterator it;
+        if (comp.empty())
+        {
+            vector< vector < bitset <2> > > d2 (pcn.size(),d1);
+            return d2;
+        }
+
+        else
+        {
+            //int i = 0;
+            for(int i = 0; i < pcn.size(); i++)
+            {
+                for(int j = 0; j < lim; j++)
+                {
+                    for(int k = 0; k < comp.size(); k++)
+                    {
+                        if(pcn[i][j] == ~comp[k][j])
+                        {
+                            //if(sumb.size() > j)
+                            sumb[j].first+=1;
+                            sumb[j].second.push_back(k);
+                        }
+                    }
+                }
+
+//Uncomment for debugging
+                //cout<<sumb[0].first<<" "<<sumb[1].first<<" "<<sumb[2].first<<" "<<sumb[3].first<<endl;
+//                for(it2 = sumb[2].second.begin(); it2 != sumb[2].second.end(); it2++)
+//                {
+//                    cout<<*it2;
+//                }
+                //cout<<endl;
+                it = max_element(sumb.begin(), sumb.end());
+
+                //cout<<sum.size()<<endl;
+                while(it->first != 0)
+                {
+                    sum = it->second;
+                    //sort(sum.begin(),sum.end());
+                    //cout<<sum[0]<<sum[1]<<endl;
+                    dist = it - sumb.begin();
+                    //cout<<dist<<endl;
+                    sumb[dist].first = 0;
+                    sumb[dist].second.clear();
+                    d1[dist] = pcn[i][dist];
+                    //cout<<"yeah";
+                    //
+                    it = sumb.begin();
+
+                    while(it != sumb.end())
+                    {
+                       if (it->first == 0)
+                       {
+                           it+=1;
+                           continue;
+                       }
+
+//                        for(it2 = it->second.begin(); it2 != it->second.end(); it2++)
+//                        {
+//                            cout<<*it2;
+//                        }
+//                        cout<<endl;
+//                       for(it2 = sum.begin(); it2 != sum.end(); it2++)
+//                        {
+//                            cout<<*it2;
+//                        }
+//                        cout<<endl;
+
+                       itv = set_difference(it->second.begin(), it->second.end(), sum.begin(), sum.end(), v.begin());
+
+                       v.resize(itv - v.begin());
+
+//Uncomment for debugging
+
+//                       for(it2 = v.begin();it2!=v.end();it2++)
+//                       {
+//                           cout<<*it2;
+//                       }
+//                       cout<<endl;
+
+                       //cout<<v.size()<<endl;
+
+                       //sort(v.begin(), v.end());
+
+                       it->first = v.size();
+                       it->second.clear();
+                       it->second = v;
+                       v.resize(10);
+                       it+=1;
+                       //cout<<sumb[1].second[0]<<sumb[3].second[0]<<endl;
+                    }
+
+                    it = max_element(sumb.begin(), sumb.end());
+
+                    //cout<< (it - sumb.begin());
+                    //cout<<(it->second[0])<<endl;
+                    //sum.clear();
+                    //cout<<sumb[0].first<<" "<<sumb[1].first<<" "<<sumb[2].first<<" "<<sumb[3].first<<endl;
+                    //itv = set_difference(it->second.begin(), it->second.end(), sum.begin(), sum.end(), v.begin());
+                    //v.resize(itv - v.begin());
+
+                    //if(v.empty()) continue;
+
+                    //if((sum.size()+v.size())==comp.size()) break;
+                    //if(it->first == 0) break;
+//                    else
+//                    {
+//                        sum.insert(sum.end(), v.begin(), v.end());
+//                        sort(sum.begin(),sum.end());
+//                    }
+//
+                }
+                //cout<<sum.size()<<endl;
+                //dist = it - sumb.begin();
+                //d1[dist] = pcn[i][dist];
+                pcn[i] = d1;
+                fill(d1.begin(),d1.end(),expr_2);
+                //sumb.clear();
+                //sum.clear();
+                sumb = reset;
+
+
+            }
+        }
+        return pcn;
     }
 
 int main()
@@ -257,6 +402,7 @@ int main()
     //vector <bool> expr_2 (2,1);
     vector < bitset<2> > expr_1 (var, expr_2);
     vector < vector < bitset<2> > > expr (cube, expr_1);
+    vector < vector < bitset<2> > > expr_bar;
     //expr_2.clear();
     //expr_1.clear();
     //getline(read,s,' ');
@@ -293,7 +439,17 @@ int main()
     }
     cout<<endl;
     binate_priority(expr);
-    expr = complement(expr);
+    expr_bar = complement(expr);
+    for(int l = 0; l < expr_bar.size(); l++)
+    {
+        for(int k = 0; k < var; k++)
+        {
+            cout<<expr_bar[l][k]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
+    expr = expand(expr,expr_bar);
     for(int l = 0; l < expr.size(); l++)
     {
         for(int k = 0; k < var; k++)
