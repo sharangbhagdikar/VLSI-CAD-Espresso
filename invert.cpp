@@ -11,9 +11,10 @@
 #include <bitset>
 
 using namespace std;
-
+int var;
 bitset<2> expr_2 (3);
 bitset<2> expr_3 (0);
+
 vector <int> var_order;
 
 
@@ -45,6 +46,24 @@ bool Isunit (vector < bitset<2> > x)
 
 vector < vector < bitset<2> > > OR (vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > pcn2)
     {
+        vector < bitset<2> > one (var,expr_2);
+
+
+        for(int i = 0; i<pcn.size(); i++)
+        {
+            if(Isunit(pcn[i]))
+            {
+                return vector < vector < bitset<2> > > (1,one);
+            }
+        }
+
+        for(int i = 0; i<pcn2.size(); i++)
+        {
+            if(Isunit(pcn2[i]))
+            {
+                return vector < vector < bitset<2> > > (1,one);
+            }
+        }
         pcn.insert(pcn.end(), pcn2.begin(), pcn2.end());
         return pcn;
     }
@@ -53,37 +72,41 @@ vector < vector < bitset<2> > > AND (vector < vector < bitset<2> > > pcn, int li
     {
         bitset<2> a (1);
         bitset<2> b (2);
-        if(literal > 0)
-        {
-
-            for(int k = 0; k < pcn.size(); k++)
+        //if(!pcn.empty())
+        //{
+            if(literal > 0)
             {
-                pcn[k][literal-1]&=a;
 
-                if(pcn[k][literal-1] == 0)
+                for(int k = 0; k < pcn.size(); k++)
                 {
-                    pcn.erase(pcn.begin()+k);
-                    k -= 1;
+                    pcn[k][literal-1]&=a;
+
+                    if(pcn[k][literal-1] == 0)
+                    {
+                        pcn.erase(pcn.begin()+k);
+                        k -= 1;
+                    }
                 }
             }
-        }
 
-        else if(literal < 0)
-        {
-            for(int k = 0; k < pcn.size(); k++)
+            else if(literal < 0)
             {
-                pcn[k][-literal-1]&=b;
-
-                if(pcn[k][-literal-1] == 0)
+                for(int k = 0; k < pcn.size(); k++)
                 {
-                    pcn.erase(pcn.begin()+k);
-                    k -= 1;
+                    pcn[k][-literal-1]&=b;
+
+                    if(pcn[k][-literal-1] == 0)
+                    {
+                        pcn.erase(pcn.begin()+k);
+                        k -= 1;
+                    }
                 }
             }
-        }
 
-        else
-        pcn.erase(pcn.begin(), pcn.end());
+            else
+            pcn.erase(pcn.begin(), pcn.end());
+        //}
+
 
         return pcn;
 
@@ -148,7 +171,7 @@ void binate_priority(vector < vector < bitset<2> > > pcn)
         int val, val2;
         vector <int> index, subset;
         vector <int>::iterator p,o;
-        for(int j = 0; j < pcn[0].size(); j++)
+        for(int j = 0; j < var; j++)
         {
             for(int i = 0; i < pcn.size(); i++)
             {
@@ -203,62 +226,54 @@ void binate_priority(vector < vector < bitset<2> > > pcn)
 
 vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, int depth = 0)
     {
-        int lim = pcn[0].size();
-
-
         if(pcn.size()==1)
         {
-            vector <bitset <2> > b (lim,expr_2);
+            vector <bitset <2> > b (var,expr_2);
             vector < vector < bitset<2> > > co (1,b);
             vector < vector < bitset<2> > > comp;
-
-            for(int k = 0; k < lim; k++)
+            if(!Isunit(pcn[0]))
             {
-                if(pcn[0][k] == 01)
+                for(int k = 0; k < var; k++)
                 {
-                    comp = OR(AND(co, -(k+1)), comp);
+                    if(pcn[0][k] == 01)
+                    {
+                        comp = OR(AND(co, -(k+1)), comp);
+                    }
+                    else if(pcn[0][k] == 10)
+                    {
+                        comp = OR(AND(co, (k+1)), comp);
+                    }
                 }
-                else if(pcn[0][k] == 10)
-                {
-                    comp = OR(AND(co, (k+1)), comp);
-                }
+                return comp;
             }
-            return comp;
-
+            else return vector < vector < bitset<2> > > ();
         }
+
         else if(pcn.empty())
         {
-            vector <bitset <2> > d (lim,expr_3);
-            vector < vector < bitset<2> > > co2 (1,d);
-            return co2;
+            vector <bitset <2> > d (var,expr_2);
+            return vector < vector < bitset<2> > > (1,d);
         }
 
         else
         {
-            return (OR(AND(complement(cofactor(pcn,var_order[depth]),depth+1), var_order[depth]), AND(complement(cofactor(pcn,-var_order[depth]), depth+1), -var_order[depth])));
+            return ( OR( AND( complement( cofactor( pcn, var_order[depth] ), depth+1 ), var_order[depth] ), AND( complement( cofactor( pcn, -var_order[depth] ), depth+1 ), -var_order[depth] ) ) );
         }
 
     }
 
     vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > comp)
     {
-        int lim = pcn[0].size();
         int dist = 0;
-        vector< bitset <2> > d1 (lim, expr_2);
-        //vector< bitset <2> > reset (d1);
+        vector< bitset <2> > d1 (var, expr_2);
         vector <int> v(10);
-        //vector <int> sum1 (lim, 0);
-        //vector < vector <int> > sum (1, sum1);
-        //sum1.clear();
         vector <int> sum;
-        vector <pair <int, vector<int> > > sumb (lim , make_pair(0,sum));
+        vector <pair <int, vector<int> > > sumb (var , make_pair(0,sum));
         // Find a way to get around this
-        vector <pair <int, vector<int> > > reset (sumb);
+        //vector <pair <int, vector<int> > > reset (sumb);
         vector <pair <int, vector<int> > > :: iterator it;
         vector <int> :: iterator itv,it2;
-        // Try both methods
-        //vector <pair <int, vector<int> > > sumb;
-        //vector <pair <int, vector<int> > >::iterator it;
+
         if (comp.empty())
         {
             vector< vector < bitset <2> > > d2 (pcn.size(),d1);
@@ -270,7 +285,7 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
             //int i = 0;
             for(int i = 0; i < pcn.size(); i++)
             {
-                for(int j = 0; j < lim; j++)
+                for(int j = 0; j < var; j++)
                 {
                     for(int k = 0; k < comp.size(); k++)
                     {
@@ -283,7 +298,7 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
                     }
                 }
 
-//Uncomment for debugging
+                //Uncomment for debugging
                 //cout<<sumb[0].first<<" "<<sumb[1].first<<" "<<sumb[2].first<<" "<<sumb[3].first<<endl;
 //                for(it2 = sumb[2].second.begin(); it2 != sumb[2].second.end(); it2++)
 //                {
@@ -330,7 +345,7 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
 
                        v.resize(itv - v.begin());
 
-//Uncomment for debugging
+                        //Uncomment for debugging
 
 //                       for(it2 = v.begin();it2!=v.end();it2++)
 //                       {
@@ -345,6 +360,7 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
                        it->first = v.size();
                        it->second.clear();
                        it->second = v;
+                       // Change here
                        v.resize(10);
                        it+=1;
                        //cout<<sumb[1].second[0]<<sumb[3].second[0]<<endl;
@@ -375,11 +391,13 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
                 //d1[dist] = pcn[i][dist];
                 pcn[i] = d1;
                 fill(d1.begin(),d1.end(),expr_2);
+                //cout<<sumb[0].first<<sumb[1].first<<sumb[2].first<<sumb[3].first<<endl;
+                //cout<<sumb[0].second.size()<<sumb[1].second.size()<<sumb[2].second.size()<<sumb[3].second.size()<<endl;
                 //sumb.clear();
                 //sum.clear();
-                sumb = reset;
 
-
+                // Being taken care of in while loop itself where we remove redundant cubes
+                //sumb = vector <pair <int, vector<int> > > (var , make_pair(0,sum));
             }
         }
         return pcn;
@@ -390,7 +408,7 @@ int main()
 
     ifstream read;
     string s;
-    int var,cube,lit,p,j;
+    int cube,lit,p,j;
     read.open("part1.pcn");
     vector <int>::iterator o;
     getline(read,s);
@@ -402,6 +420,7 @@ int main()
     //vector <bool> expr_2 (2,1);
     vector < bitset<2> > expr_1 (var, expr_2);
     vector < vector < bitset<2> > > expr (cube, expr_1);
+    vector < vector < bitset<2> > > test (1, expr_1);
     vector < vector < bitset<2> > > expr_bar;
     //expr_2.clear();
     //expr_1.clear();
@@ -439,7 +458,13 @@ int main()
     }
     cout<<endl;
     binate_priority(expr);
+    //cout<<"yes"<<endl;
+
+    //expr_bar = cofactor(cofactor(cofactor(expr, -3), 1), -4);
+
     expr_bar = complement(expr);
+    //cout<<expr_bar[0].size();
+    //expr = OR(expr,expr);
     for(int l = 0; l < expr_bar.size(); l++)
     {
         for(int k = 0; k < var; k++)
@@ -462,13 +487,8 @@ int main()
 //    {
 //        cout<<var_order[h]<<endl;
 //    }
-//    cout<<index[0];
-//    vector <int> der;
-//    der.push_back(1);
-//    der.push_back(3);
-//    der.push_back(1);
-//    der.push_back(4);
-//
+
+
 //    o = min_element(der.begin(),der.end());
 //    while(o != der.end())
 //    {
