@@ -112,6 +112,51 @@ vector < vector < bitset<2> > > AND (vector < vector < bitset<2> > > pcn, int li
 
     }
 
+vector < vector < bitset<2> > > ANDl (vector < vector < bitset<2> > > pcn, vector < bitset<2> > pcn2)
+    {
+
+        if(pcn2.empty())
+        {
+            return vector < vector < bitset<2> > > ();
+        }
+
+        for(int k = 0; k < pcn.size(); k++)
+        {
+            for(int i = 0; i < var; i++)
+            {
+                pcn[k][i]&=pcn2[i];
+                if(pcn[k][i] == 00)
+                {
+                    pcn.erase(pcn.begin()+k);
+                    k -= 1;
+                    break;
+                }
+
+            }
+        }
+        return pcn;
+
+    }
+
+vector < bitset<2> > ORb (vector < vector < bitset<2> > > pcn)
+    {
+        if (pcn.empty())
+        {
+            return vector < bitset<2> > ();
+        }
+
+        for(int i = 1; i < pcn.size(); i++)
+        {
+            for(int j = 0; j < var; j++)
+            {
+                pcn[0][j]|=pcn[i][j];
+            }
+        }
+
+        return pcn[0];
+
+    }
+
 vector < vector < bitset<2> > > cofactor(vector < vector < bitset<2> > > pcn, int literal)
     {
         if(literal > 0)
@@ -262,7 +307,7 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
 
     }
 
-    vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > comp)
+vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > comp)
     {
         int dist = 0;
         vector< bitset <2> > d1 (var, expr_2);
@@ -403,6 +448,45 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
         return pcn;
     }
 
+vector < vector < bitset<2> > > irredundant(vector < vector < bitset<2> > > pcn)
+    {
+        vector <int> track;
+
+        for(int i = 0; i < pcn.size(); i++)
+        {
+            for(int j = 0; j < var; j++)
+            {
+                if (pcn[i][j] == 01)
+                {
+                    track.push_back(j+1);
+                }
+                else if (pcn[i][j] == 10)
+                {
+                    track.push_back(-(j+1));
+                }
+
+            }
+        }
+    }
+
+vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn)
+    {
+        // Doesn't work for irredundant case CHECK!
+        vector < vector < bitset<2> > > t (pcn);
+        vector < vector < bitset<2> > > com;
+        for(int k = 0; k < pcn.size(); k++)
+        {
+            t.erase(t.begin()+k);
+            com = complement(t);
+            com = ANDl(com,pcn[k]);
+            pcn[k] = ORb(com);
+            t = pcn;
+        }
+
+        return pcn;
+
+
+    }
 int main()
 {
 
@@ -474,7 +558,8 @@ int main()
         cout<<endl;
     }
     cout<<endl;
-    expr = expand(expr,expr_bar);
+    //expr = expand(expr,expr_bar);
+    expr = reduce(expr);
     for(int l = 0; l < expr.size(); l++)
     {
         for(int k = 0; k < var; k++)
