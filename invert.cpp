@@ -307,6 +307,91 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
 
     }
 
+pair< bool, vector <int> > isUnate (vector < vector < bitset <2> > > pcn, int lit)
+    {
+        if(pcn.empty()) return make_pair(0,vector <int> ());
+
+        bitset <2> a (3);
+        vector <int> ind;
+        for(int i = 0; i < pcn.size(); i++)
+        {
+            a &= pcn[i][lit];
+            if(a == 0)
+            {
+                return make_pair(0,vector <int> ());
+            }
+            if(pcn[i][lit] == 3)
+            {
+                ind.push_back(i);
+            }
+        }
+
+        return make_pair(1, ind);
+    }
+
+vector < vector < bitset <2> > > unateRed (vector < vector < bitset <2> > > pcn)
+    {
+        if(pcn.empty()) return pcn;
+        vector <int> y, v(pcn.size());
+        bool x = false;
+        vector <int>::iterator it;
+        pair < bool, vector <int> > b;
+        vector < vector < bitset <2> > > k;
+        for (int i = 0; i < pcn[0].size(); i++)
+        {
+            b = isUnate(pcn,i);
+            if(b.first)
+            {
+                //x.push_back(i);
+                x = true;
+                for(int j = 0; j < pcn.size(); j++)
+                {
+                    pcn[j].erase(pcn[j].begin()+i);
+                    //cout<<"lol";
+
+                }
+                i -= 1;
+                if (y.empty()) y = b.second;
+
+                else
+                {
+                    it = set_intersection(b.second.begin(), b.second.end(), y.begin(), y.end(), y.begin());
+                    y.resize(it - y.begin());
+                    if(y.empty()) return vector < vector < bitset <2> > > ();
+                }
+            }
+        }
+        if (!x) return pcn;
+        for(it = y.begin(); it != y.end(); it++)
+        {
+            k.push_back(pcn[*it]);
+            //cout<<pcn[0].size()<<endl;
+            //cout<<y.size()<<endl;
+        }
+        return k;
+
+    }
+
+bool isTautology (vector < vector < bitset <2> > > pcn)
+    {
+        if(pcn.empty()) return 0;
+
+        if(pcn.size() == 1)
+        {
+            if(Isunit(pcn[0])) return 1;
+        }
+
+        for(int i = 0; i < var; i++)
+        {
+
+        }
+
+
+
+
+
+    }
+
 vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > comp)
     {
         int dist = 0;
@@ -406,7 +491,7 @@ vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vect
                        it->second.clear();
                        it->second = v;
                        // Change here
-                       v.resize(10);
+                       v.resize(pcn.size());
                        it+=1;
                        //cout<<sumb[1].second[0]<<sumb[3].second[0]<<endl;
                     }
@@ -503,9 +588,10 @@ int main()
 
     //vector <bool> expr_2 (2,1);
     vector < bitset<2> > expr_1 (var, expr_2);
-    vector < vector < bitset<2> > > expr (cube, expr_1);
+    vector < vector < bitset<2> > > expr (cube, expr_1),ktest;
     vector < vector < bitset<2> > > test (1, expr_1);
     vector < vector < bitset<2> > > expr_bar;
+    pair < bool, vector <int> > bas;
     //expr_2.clear();
     //expr_1.clear();
     //getline(read,s,' ');
@@ -559,18 +645,28 @@ int main()
     }
     cout<<endl;
     //expr = expand(expr,expr_bar);
-    expr = reduce(expr);
-    for(int l = 0; l < expr.size(); l++)
+    ktest = unateRed(expr);
+    //bas = isUnate(expr,1);
+//    for(int l = 0; l < expr.size(); l++)
+//    {
+//        for(int k = 0; k < var; k++)
+//        {
+//            cout<<expr[l][k]<<" ";
+//        }
+//        cout<<endl;
+//    }
+    for(int l = 0; l < ktest.size(); l++)
     {
-        for(int k = 0; k < var; k++)
+        for(int k = 0; k < ktest[0].size(); k++)
         {
-            cout<<expr[l][k]<<" ";
+            cout<<ktest[l][k]<<" ";
         }
         cout<<endl;
     }
-//    for(int h = 0; h<var_order.size(); h++)
+//cout<<bas.first<<endl;
+//    for(int h = 0; h<bas.second.size(); h++)
 //    {
-//        cout<<var_order[h]<<endl;
+//        cout<<bas.second[h]<<endl;
 //    }
 
 
