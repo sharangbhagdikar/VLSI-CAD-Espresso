@@ -307,6 +307,7 @@ vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, 
 
     }
 
+
 pair< bool, vector <int> > isUnate (vector < vector < bitset <2> > > pcn, int lit)
     {
         if(pcn.empty()) return make_pair(0,vector <int> ());
@@ -329,9 +330,10 @@ pair< bool, vector <int> > isUnate (vector < vector < bitset <2> > > pcn, int li
         return make_pair(1, ind);
     }
 
+
 vector < vector < bitset <2> > > unateRed (vector < vector < bitset <2> > > pcn)
     {
-        if(pcn.empty()) return pcn;
+        if(pcn.empty() | pcn.size()==1) return pcn;
         vector <int> y, v(pcn.size());
         bool x = false;
         vector <int>::iterator it;
@@ -368,12 +370,14 @@ vector < vector < bitset <2> > > unateRed (vector < vector < bitset <2> > > pcn)
             //cout<<pcn[0].size()<<endl;
             //cout<<y.size()<<endl;
         }
-        return k;
+        return unateRed(k);
 
     }
 
-bool isTautology (vector < vector < bitset <2> > > pcn)
+
+bool isTautology (vector < vector < bitset <2> > > pcn, int depth = 0)
     {
+        pcn = unateRed(pcn);
         if(pcn.empty()) return 0;
 
         if(pcn.size() == 1)
@@ -381,15 +385,9 @@ bool isTautology (vector < vector < bitset <2> > > pcn)
             if(Isunit(pcn[0])) return 1;
         }
 
-        for(int i = 0; i < var; i++)
-        {
+        if(depth == 0) binate_priority(pcn);
 
-        }
-
-
-
-
-
+        return (isTautology(cofactor(pcn,var_order[depth]), depth + 1) & isTautology(cofactor(pcn,-var_order[depth]), depth + 1));
     }
 
 vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > comp)
@@ -663,7 +661,7 @@ int main()
         }
         cout<<endl;
     }
-//cout<<bas.first<<endl;
+cout<<isTautology(expr)<<endl;
 //    for(int h = 0; h<bas.second.size(); h++)
 //    {
 //        cout<<bas.second[h]<<endl;
