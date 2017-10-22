@@ -442,8 +442,18 @@ vector < vector < bitset <2> > > unateRed (vector < vector < bitset <2> > > pcn)
 
 bool isTautology (vector < vector < bitset <2> > > pcn, int depth = 0)
     {
-        pcn = unateRed(pcn);
+        if (depth == 0) pcn = unateRed(pcn);
         if(pcn.empty()) return 0;
+        if(pcn[0].empty()) return 0;
+//        cout<<"works";
+//        for(int l = 0; l < pcn.size(); l++)
+//        {
+//            for(int k = 0; k < pcn[0].size(); k++)
+//            {
+//                cout<<pcn[l][k]<<" ";
+//            }
+//            cout<<endl;
+//        }
 
         if(pcn.size() == 1)
         {
@@ -602,7 +612,7 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
     {
         if(pcn.empty() | pcn.size()==1) return pcn;
 
-        vector < vector < bitset<2> > > H,comp,result,temp;
+        vector < vector < bitset<2> > > H,comp,result,temp,x;
         //vector < bitset<2> > comp;
         for(int i = 0; i < pcn.size(); i++)
         {
@@ -617,8 +627,17 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
           comp.clear();
           comp = consensus(H,pcn[i]);
           //cout<<"lol";
+//          x = comp;
+//          for(int l = 0; l < x.size(); l++)
+//          {
+//            for(int k = 0; k < var; k++)
+//            {
+//                cout<<x[l][k]<<" ";
+//            }
+//            cout<<endl;
+//          }
 
-          if( ! (isTautology(gencofactor(comp,pcn[i]))) ) result.push_back(pcn[i]);
+          if( ! (isTautology(gencofactor(comp, pcn[i]))) ) result.push_back(pcn[i]);
 
           //cout<<"class";
           H.clear();
@@ -684,10 +703,10 @@ int main()
 
     //vector <bool> expr_2 (2,1);
     vector < bitset<2> > expr_1 (var, expr_2), gen;
-    gen.push_back(2);
-    gen.push_back(2);
     gen.push_back(3);
-//    gen.push_back(2);
+    gen.push_back(2);
+    gen.push_back(1);
+    gen.push_back(3);
     vector < vector < bitset<2> > > expr (cube, expr_1),ktest;
     vector < vector < bitset<2> > > test (1, expr_1);
     vector < vector < bitset<2> > > expr_bar;
