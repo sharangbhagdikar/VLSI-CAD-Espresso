@@ -239,6 +239,30 @@ vector < vector < bitset<2> > > cofactor(vector < vector < bitset<2> > > pcn, in
         return pcn;
     }
 
+vector < vector < bitset<2> > > gencofactor(vector < vector < bitset<2> > > pcn , vector < bitset<2> > pcn2)
+    {
+        if(pcn.empty()) return pcn;
+
+        for(int i = 0; i < var; i++)
+        {
+            if(pcn2[i] == 11) continue;
+            for(int j = 0; j < pcn.size(); j++)
+            {
+                if(pcn[j][i] == 11) continue;
+
+                if(pcn[j][i] == ~pcn2[i])
+                {
+                    pcn.erase(pcn.begin()+j);
+                    j-=1;
+                }
+                else pcn[j][i] = 11;
+
+            }
+        }
+        return pcn;
+
+    }
+
 void binate_priority(vector < vector < bitset<2> > > pcn)
     {
         vector <int> sum1, sum2;
@@ -626,7 +650,11 @@ int main()
     cube = atoi(s.c_str());
 
     //vector <bool> expr_2 (2,1);
-    vector < bitset<2> > expr_1 (var, expr_2);
+    vector < bitset<2> > expr_1 (var, expr_2), gen;
+//    gen.push_back(1);
+//    gen.push_back(3);
+//    gen.push_back(1);
+//    gen.push_back(2);
     vector < vector < bitset<2> > > expr (cube, expr_1),ktest;
     vector < vector < bitset<2> > > test (1, expr_1);
     vector < vector < bitset<2> > > expr_bar;
@@ -684,25 +712,26 @@ int main()
     }
     cout<<endl;
     //expr = expand(expr,expr_bar);
-    ktest = unateRed(expr);
+    //ktest = unateRed(expr);
     //bas = isUnate(expr,1);
-//    for(int l = 0; l < expr.size(); l++)
-//    {
-//        for(int k = 0; k < var; k++)
-//        {
-//            cout<<expr[l][k]<<" ";
-//        }
-//        cout<<endl;
-//    }
-    for(int l = 0; l < ktest.size(); l++)
+    //expr = gencofactor(expr,gen);
+    for(int l = 0; l < expr.size(); l++)
     {
-        for(int k = 0; k < ktest[0].size(); k++)
+        for(int k = 0; k < var; k++)
         {
-            cout<<ktest[l][k]<<" ";
+            cout<<expr[l][k]<<" ";
         }
         cout<<endl;
     }
-cout<<isTautology(expr)<<endl;
+//    for(int l = 0; l < ktest.size(); l++)
+//    {
+//        for(int k = 0; k < ktest[0].size(); k++)
+//        {
+//            cout<<ktest[l][k]<<" ";
+//        }
+//        cout<<endl;
+//    }
+//    cout<<isTautology(expr)<<endl;
 //    for(int h = 0; h<bas.second.size(); h++)
 //    {
 //        cout<<bas.second[h]<<endl;
