@@ -157,6 +157,36 @@ vector < bitset<2> > ORb (vector < vector < bitset<2> > > pcn)
 
     }
 
+vector < vector < bitset<2> > > consensus (vector < vector < bitset<2> > > pcn, vector < bitset<2> > pcn2)
+    {
+        if(pcn.empty()) return vector < vector < bitset<2> > > ();
+        if(pcn2.empty()) return vector < vector < bitset<2> > > ();
+
+        vector < vector < bitset<2> > > con;
+        vector < bitset<2> > temp;
+        for(int i = 0; i < pcn.size(); i++)
+        {
+            temp = pcn[i];
+            for(int j = 0; j < var; j++)
+            {
+                temp[j] |= pcn2[j];
+                for(int k = 0; k < var; k++)
+                {
+                    if(k == j) continue;
+                    temp[k] &= pcn2[k];
+                }
+
+                con.push_back(temp);
+                if(Isunit(temp))
+                {
+                    con.erase(con.end()-j-1, con.end()-1);
+                    break;
+                }
+            }
+        }
+        return con;
+    }
+
 vector < vector < bitset<2> > > cofactor(vector < vector < bitset<2> > > pcn, int literal)
     {
         if(literal > 0)
@@ -359,6 +389,7 @@ vector < vector < bitset <2> > > unateRed (vector < vector < bitset <2> > > pcn)
                 {
                     it = set_intersection(b.second.begin(), b.second.end(), y.begin(), y.end(), y.begin());
                     y.resize(it - y.begin());
+                    // should y be resized again?
                     if(y.empty()) return vector < vector < bitset <2> > > ();
                 }
             }
@@ -383,6 +414,7 @@ bool isTautology (vector < vector < bitset <2> > > pcn, int depth = 0)
         if(pcn.size() == 1)
         {
             if(Isunit(pcn[0])) return 1;
+            else return 0;
         }
 
         if(depth == 0) binate_priority(pcn);
@@ -530,6 +562,15 @@ vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vect
         }
         return pcn;
     }
+
+
+vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
+    {
+        if(pcn.empty()) return vector < vector < bitset<2> > > ();
+
+
+    }
+
 
 vector < vector < bitset<2> > > irredundant(vector < vector < bitset<2> > > pcn)
     {
