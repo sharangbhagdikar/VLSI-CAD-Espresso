@@ -162,19 +162,29 @@ vector < vector < bitset<2> > > consensus (vector < vector < bitset<2> > > pcn, 
         if(pcn.empty()) return vector < vector < bitset<2> > > ();
         if(pcn2.empty()) return vector < vector < bitset<2> > > ();
 
+        bool trig = false;
         vector < vector < bitset<2> > > con;
         vector < bitset<2> > temp;
+
         for(int i = 0; i < pcn.size(); i++)
         {
-            temp = pcn[i];
+
             for(int j = 0; j < var; j++)
             {
+                trig = false;
+                temp = pcn[i];
                 temp[j] |= pcn2[j];
                 for(int k = 0; k < var; k++)
                 {
                     if(k == j) continue;
                     temp[k] &= pcn2[k];
+                    if(temp[k]==0)
+                    {
+                        trig = true;
+                        break;
+                    }
                 }
+                if(trig) continue;
 
                 con.push_back(temp);
                 if(Isunit(temp))
@@ -590,8 +600,31 @@ vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vect
 
 vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
     {
-        if(pcn.empty()) return vector < vector < bitset<2> > > ();
+        if(pcn.empty() | pcn.size()==1) return pcn;
 
+        vector < vector < bitset<2> > > H,comp,result,temp;
+        //vector < bitset<2> > comp;
+        for(int i = 0; i < pcn.size(); i++)
+        {
+          comp = complement(vector < vector < bitset<2> > > (1,pcn[i]));
+          for(int j = 0; j < comp.size(); j++)
+          {
+              temp = ANDl(pcn,comp[j]);
+              H.insert(H.end(),temp.begin(),temp.end());
+              temp.clear();
+          }
+          temp.clear();
+          comp.clear();
+          comp = consensus(H,pcn[i]);
+          //cout<<"lol";
+
+          if( ! (isTautology(gencofactor(comp,pcn[i]))) ) result.push_back(pcn[i]);
+
+          //cout<<"class";
+          H.clear();
+          comp.clear();
+        }
+        return result;
 
     }
 
@@ -651,9 +684,9 @@ int main()
 
     //vector <bool> expr_2 (2,1);
     vector < bitset<2> > expr_1 (var, expr_2), gen;
-//    gen.push_back(1);
-//    gen.push_back(3);
-//    gen.push_back(1);
+    gen.push_back(2);
+    gen.push_back(2);
+    gen.push_back(3);
 //    gen.push_back(2);
     vector < vector < bitset<2> > > expr (cube, expr_1),ktest;
     vector < vector < bitset<2> > > test (1, expr_1);
@@ -715,6 +748,8 @@ int main()
     //ktest = unateRed(expr);
     //bas = isUnate(expr,1);
     //expr = gencofactor(expr,gen);
+    //expr = consensus(expr, gen);
+    expr = essentials(expr);
     for(int l = 0; l < expr.size(); l++)
     {
         for(int k = 0; k < var; k++)
