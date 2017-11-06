@@ -337,6 +337,8 @@ void binate_priority(vector < vector < bitset<2> > > pcn)
 
 vector < vector < bitset<2> > > complement(vector < vector < bitset<2> > > pcn, int depth = 0)
     {
+        if(depth == 0) binate_priority(pcn);
+
         if(pcn.size()==1)
         {
             vector <bitset <2> > b (var,expr_2);
@@ -621,11 +623,21 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
         vector < int > indices;
         vector < vector < bitset<2> > > H,comp,result,temp,x;
         //vector < bitset<2> > comp;
-        //int i = 0;
-        for(int i = 0; i < pcn.size(); i++)
-        {
+        int i = 0;
+        //for(int i = 0; i < pcn.size(); i++)
+        //{
 
           comp = complement(vector < vector < bitset<2> > > (1,pcn[i]));
+
+//          for(int l = 0; l < comp.size(); l++)
+//          {
+//            for(int k = 0; k < var; k++)
+//            {
+//                cout<<comp[l][k]<<" ";
+//            }
+//            cout<<endl;
+//          }
+//          cout<<endl;
 
           for(int j = 0; j < comp.size(); j++)
           {
@@ -635,10 +647,19 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
               temp.clear();
           }
 
+//         for(int l = 0; l < H.size(); l++)
+//            {
+//                for(int k = 0; k < H[0].size(); k++)
+//                {
+//                    cout<<H[l][k]<<" ";
+//                }
+//                cout<<endl;
+//            }
+//            cout<<endl;
+
           temp.clear();
           comp.clear();
           comp = consensus(H,pcn[i]);
-
 //          cout<<"lol";
 //          x = comp;
 //          for(int l = 0; l < x.size(); l++)
@@ -661,7 +682,7 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
 //          cout<<"class";
           H.clear();
           comp.clear();
-        }
+        //}
         for(int j = 0; j < indices.size(); j++)
         {
             //cout<<indices[i]<<" ";
@@ -845,7 +866,7 @@ int main()
         cout<<endl;
     }
     cout<<endl;
-    binate_priority(expr);
+    //binate_priority(expr);
     //cout<<"yes"<<endl;
 
     //expr_bar = cofactor(cofactor(cofactor(expr, -3), 1), -4);
@@ -861,7 +882,7 @@ int main()
         }
         cout<<endl;
     }
-    cout<<endl;
+//    cout<<endl;
     //expr = expand(expr,expr_bar);
     //ktest = unateRed(expr);
     //bas = isUnate(expr,1);
@@ -878,7 +899,7 @@ int main()
 //        }
 //        cout<<endl;
 //    }
-//    cout<<endl;
+    cout<<endl;
     for(int l = 0; l < ktest.size(); l++)
     {
         for(int k = 0; k < ktest[0].size(); k++)
