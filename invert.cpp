@@ -890,9 +890,9 @@ int main()
 
     //vector <bool> expr_2 (2,1);
     vector < bitset<2> > expr_1 (var, expr_2), gen;
-//    gen.push_back(3);
-//    gen.push_back(3);
-//    gen.push_back(1);
+    gen.push_back(3);
+    gen.push_back(3);
+    gen.push_back(1);
     //cout<<gen[2]<<endl;
     //gen.push_back(3);
     vector < vector < bitset<2> > > expr (cube, expr_1),ktest;
@@ -961,16 +961,18 @@ int main()
     //expr = essentials(expr);
     //ktest = expand(expr,expr_bar);
     ktest = irredundant(expr, vector < vector < bitset <2> > > (1,gen));
+
 //    cout<<isTautology(expr);
-//    for(int l = 0; l < expr.size(); l++)
-//    {
-//        for(int k = 0; k < var; k++)
-//        {
-//            cout<<expr[l][k]<<" ";
-//        }
-//        cout<<endl;
-//    }
-//    cout<<endl;
+    for(int l = 0; l < ktest.size(); l++)
+    {
+        for(int k = 0; k < var; k++)
+        {
+            cout<<ktest[l][k]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
+    ktest = reduce(ktest,vector < vector < bitset <2> > > (1,gen));
     for(int l = 0; l < ktest.size(); l++)
     {
         for(int k = 0; k < ktest[0].size(); k++)
