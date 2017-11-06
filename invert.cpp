@@ -610,12 +610,18 @@ vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vect
     }
 
 
-vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
+vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn)
     {
-        if(pcn.empty() | pcn.size()==1) return pcn;
-
+        if(pcn.empty() | pcn.size()==1)
+        {
+            vector < vector < bitset<2> > > t (pcn);
+            pcn.clear();
+            return t;
+        }
+        vector < int > indices;
         vector < vector < bitset<2> > > H,comp,result,temp,x;
         //vector < bitset<2> > comp;
+        //int i = 0;
         for(int i = 0; i < pcn.size(); i++)
         {
 
@@ -632,6 +638,7 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
           temp.clear();
           comp.clear();
           comp = consensus(H,pcn[i]);
+
 //          cout<<"lol";
 //          x = comp;
 //          for(int l = 0; l < x.size(); l++)
@@ -643,28 +650,43 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
 //            cout<<endl;
 //          }
 
-          if( ! (isTautology(gencofactor(comp, pcn[i]))) ) result.push_back(pcn[i]);
+          if( ! (isTautology(gencofactor(comp, pcn[i]))) )
+          {
+              result.push_back(pcn[i]);
+              indices.push_back(i);
+          }
+
+
 
 //          cout<<"class";
           H.clear();
           comp.clear();
         }
+        for(int j = 0; j < indices.size(); j++)
+        {
+            //cout<<indices[i]<<" ";
+            pcn.erase(pcn.begin() + indices[j] - j);
+        }
+        //cout<<endl;
+
         return result;
 
     }
 
 
- vector < vector < bitset<2> > > irredundant(vector < vector < bitset<2> > > pcn)
+ vector < vector < bitset<2> > > irredundant(vector < vector < bitset<2> > > temp, vector < vector < bitset<2> > > tempdc = vector < vector < bitset<2> > > ())
     {
-        //if(pcn.empty() | pcn.size()==1) return pcn;
+        int tempsize = temp.size();
+        temp.insert(temp.end(), tempdc.begin(), tempdc.end());
+        if(temp.empty() | temp.size()==1) return temp;
 
         vector < vector < bitset<2> > > er,rp,rs;
-        vector < vector < bitset<2> > > temp (pcn), H;
+        //vector < vector < bitset<2> > > temp (pcn), H;
         vector < bitset<2> > impl;
         vector <int> track2;
         vector <int>::iterator it;
 
-        for(int i = 0; i < temp.size(); i++)
+        for(int i = 0; i < tempsize; i++)
         {
             impl = temp[i];
             temp.erase(temp.begin()+i);
@@ -678,6 +700,7 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
             else
             {
                 er.push_back(impl);
+                tempdc.push_back(impl);
             }
 
             temp.insert(temp.begin()+i,impl);
@@ -685,7 +708,8 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
 
         for(int i = 0; i < rp.size(); i++)
         {
-            if( isTautology(gencofactor(er,rp[i]) ) )
+            //if( isTautology(gencofactor(er,rp[i]) ) )
+            if( isTautology(gencofactor(tempdc,rp[i]) ) )
             {
                 rp.erase(rp.begin() + i);
                 //track.erase(track.begin()+i);
@@ -737,24 +761,30 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > pcn)
         return er;
     }
 
-vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn)
+vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > pcndc = vector < vector < bitset<2> > > ())
     {
         // Doesn't work for irredundant case CHECK!
+
         vector < vector < bitset<2> > > t (pcn);
+        t.insert(t.end(), pcndc.begin(), pcndc.end());
         vector < vector < bitset<2> > > com;
+        vector < bitset<2> > tmp;
+
         for(int k = 0; k < pcn.size(); k++)
         {
+            tmp = t[k];
             t.erase(t.begin()+k);
             com = complement(t);
             com = ANDl(com,pcn[k]);
             pcn[k] = ORb(com);
-            t = pcn;
+            //t = pcn;
+            tmp = pcn[k];
+            t.insert(t.begin()+k, tmp);
         }
 
         return pcn;
-
-
     }
+
 int main()
 {
 
@@ -838,7 +868,8 @@ int main()
     //expr = gencofactor(expr,gen);
     //expr = consensus(expr, gen);
     //expr = essentials(expr);
-    ktest = irredundant(expr);
+    //ktest = expand(expr,expr_bar);
+    ktest = essentials(expr);
 //    for(int l = 0; l < expr.size(); l++)
 //    {
 //        for(int k = 0; k < var; k++)
@@ -847,6 +878,7 @@ int main()
 //        }
 //        cout<<endl;
 //    }
+//    cout<<endl;
     for(int l = 0; l < ktest.size(); l++)
     {
         for(int k = 0; k < ktest[0].size(); k++)
@@ -855,6 +887,7 @@ int main()
         }
         cout<<endl;
     }
+    cout<<ktest.size();
 //    cout<<isTautology(expr)<<endl;
 //    for(int h = 0; h<bas.second.size(); h++)
 //    {
