@@ -840,9 +840,37 @@ vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn, vect
         if (!pcndc.empty()) t.insert(t.end(), pcndc.begin(), pcndc.end());
         vector < vector < bitset<2> > > com;
         vector < bitset<2> > tmp;
+        vector <int> sum,ord;
+        vector <int>::iterator it;
         //cout<<"works";
-        for(int k = 0; k < pcn.size(); k++)
+        int var = 0;
+
+        for(int i = 0; i < 2*var; i++)
         {
+            for(int j = 0; j < t.size(); j++)
+            {
+                var+=t[j][i/2][i%2];
+            }
+         sum.push_back(var);
+         var = 0;
+        }
+
+        for(int i = 0; i < pcn.size(); i++)
+        {
+            for(int j = 0; j < 2*var; j++)
+            {
+                var += sum[j]*pcn[i][j/2][j%2];
+            }
+            ord.push_back(var);
+            var = 0;
+        }
+        int k;
+        //for(int k = 0; k < pcn.size(); k++)
+        while (!ord.empty())
+        {
+            it = max_element(ord.begin(),ord.end());
+            k = it - ord.begin();
+            ord.erase(it);
             //cout<<"0";
             tmp = t[k];
             //cout<<"1";
@@ -890,9 +918,10 @@ int main()
 
     //vector <bool> expr_2 (2,1);
     vector < bitset<2> > expr_1 (var, expr_2), gen;
-    gen.push_back(3);
+    bitset <2> r (2);
     gen.push_back(3);
     gen.push_back(1);
+    gen.push_back(3);
     //cout<<gen[2]<<endl;
     //gen.push_back(3);
     vector < vector < bitset<2> > > expr (cube, expr_1),ktest;
@@ -981,7 +1010,8 @@ int main()
         }
         cout<<endl;
     }
-//    cout<<ktest.size();
+
+//    cout<<r[1]+5;
 //    cout<<isTautology(expr)<<endl;
 //    for(int h = 0; h<bas.second.size(); h++)
 //    {
