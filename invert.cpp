@@ -252,23 +252,44 @@ vector < vector < bitset<2> > > cofactor(vector < vector < bitset<2> > > pcn, in
 
 vector < vector < bitset<2> > > gencofactor(vector < vector < bitset<2> > > pcn , vector < bitset<2> > pcn2)
     {
-        if(pcn.empty()) return pcn;
+//        if(pcn.empty()) return pcn;
+//
+//        for(int i = 0; i < var; i++)
+//        {
+//            if(pcn2[i] == 11) continue;
+//            for(int j = 0; j < pcn.size(); j++)
+//            {
+//                if(pcn[j][i] == 11) continue;
+//
+//                if(pcn[j][i] == ~pcn2[i])
+//                {
+//                    pcn.erase(pcn.begin()+j);
+//                    j-=1;
+//                }
+//                else pcn[j][i] = 11;
+//
+//            }
+//        }
 
-        for(int i = 0; i < var; i++)
+        for(int j = 0; j < pcn.size(); j++)
         {
-            if(pcn2[i] == 11) continue;
-            for(int j = 0; j < pcn.size(); j++)
+
+            for(int i = 0; i < var; i++)
             {
+                if(pcn2[i] == 11) continue;
+
                 if(pcn[j][i] == 11) continue;
 
                 if(pcn[j][i] == ~pcn2[i])
                 {
                     pcn.erase(pcn.begin()+j);
                     j-=1;
+                    break;
                 }
                 else pcn[j][i] = 11;
 
             }
+            if(Isunit(pcn[j])) return vector < vector < bitset <2> > >(1 , pcn[j]);
         }
         return pcn;
 
@@ -444,38 +465,65 @@ vector < vector < bitset <2> > > unateRed (vector < vector < bitset <2> > > pcn)
 
     }
 
+bool isTautology(vector < vector < bitset <2> > > pcn, int depth = 0)
+{
+    if(pcn.empty()) return 0;
+    if(pcn[0].empty()) return 0;
 
-bool isTautology (vector < vector < bitset <2> > > pcn, int depth = 0)
+    if(pcn.size() == 1)
     {
-        if (depth == 0) pcn = unateRed(pcn);
-        if(pcn.empty()) return 0;
-        if(pcn[0].empty()) return 0;
-//        cout<<"works";
-//        for(int l = 0; l < pcn.size(); l++)
-//        {
-//            for(int k = 0; k < pcn[0].size(); k++)
-//            {
-//                cout<<pcn[l][k]<<" ";
-//            }
-//            cout<<endl;
-//        }
-
-        if(pcn.size() == 1)
-        {
-            if(Isunit(pcn[0])) return 1;
-            else return 0;
-        }
-
-        if(depth == 0) binate_priority(pcn);
-
-        return (isTautology(cofactor(pcn,var_order[depth]), depth + 1) & isTautology(cofactor(pcn,-var_order[depth]), depth + 1));
+        if(Isunit(pcn[0])) return 1;
+        else return 0;
     }
+    if(depth == 0) binate_priority(pcn);
+
+    return (isTautology(cofactor(pcn,var_order[depth]), depth + 1) & isTautology(cofactor(pcn,-var_order[depth]), depth + 1));
+
+}
+
+//bool isTautology (vector < vector < bitset <2> > > pcn, int depth = 0)
+//    {
+//        if (depth == 0){ pcn = unateRed(pcn);
+//
+////        for(int l = 0; l < pcn.size(); l++)
+////        {
+////            for(int k = 0; k < pcn[0].size(); k++)
+////            {
+////                cout<<pcn[l][k]<<" ";
+////            }
+////            cout<<endl;
+////        }
+////        cout<<endl;
+//    }
+//        //cout<<"here";
+//        if(pcn.empty()) return 0;
+//        if(pcn[0].empty()) return 0;
+////        cout<<"works";
+////        for(int l = 0; l < pcn.size(); l++)
+////        {
+////            for(int k = 0; k < pcn[0].size(); k++)
+////            {
+////                cout<<pcn[l][k]<<" ";
+////            }
+////            cout<<endl;
+////        }
+//
+//        if(pcn.size() == 1)
+//        {
+//            if(Isunit(pcn[0])) return 1;
+//            else return 0;
+//        }
+//
+//        if(depth == 0) binate_priority(pcn);
+//
+//        return (isTautology(cofactor(pcn,var_order[depth]), depth + 1) & isTautology(cofactor(pcn,-var_order[depth]), depth + 1));
+//    }
 
 vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > comp)
     {
         int dist = 0;
         vector< bitset <2> > d1 (var, expr_2);
-        vector <int> v(10);
+        vector <int> v(11);
         vector <int> sum;
         vector <pair <int, vector<int> > > sumb (var , make_pair(0,sum));
         // Find a way to get around this
@@ -485,8 +533,7 @@ vector < vector < bitset<2> > > expand(vector < vector < bitset<2> > > pcn, vect
 
         if (comp.empty())
         {
-            vector< vector < bitset <2> > > d2 (pcn.size(),d1);
-            return d2;
+            return vector< vector < bitset <2> > > (1,d1);
         }
 
         else
@@ -698,6 +745,7 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
 
  vector < vector < bitset<2> > > irredundant(vector < vector < bitset<2> > > temp, vector < vector < bitset<2> > > tempdc = vector < vector < bitset<2> > > ())
     {
+
         int tempsize = temp.size();
         temp.insert(temp.end(), tempdc.begin(), tempdc.end());
 //
@@ -717,21 +765,37 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
         //vector < vector < bitset<2> > > temp (pcn), H;
         vector < bitset<2> > impl;
         vector <int> track2;
+        vector <int> store;
         vector <int>::iterator it;
-
+        //cout<<"yaha"<<endl;
         for(int i = 0; i < tempsize; i++)
         {
             impl = temp[i];
             temp.erase(temp.begin()+i);
-
+            //cout<<"yaha"<<endl;
+//            if(i == 2)
+//            {
+//                for(int l = 0; l < temp.size(); l++)
+//                {
+//                    for(int k = 0; k < temp[0].size(); k++)
+//                    {
+//                        cout<<temp[l][k]<<" ";
+//                    }
+//                    cout<<endl;
+//                }
+//                cout<<endl;
+//            }
             if(isTautology(gencofactor(temp,impl)))
             {
+                //cout<<"yaha"<<endl;
                 rp.push_back(impl);
+                store.push_back(i);
                 //track.push_back(i);
             }
 
             else
             {
+                //cout<<"yaha"<<endl;
                 er.push_back(impl);
                 tempdc.push_back(impl);
             }
@@ -787,8 +851,34 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
 //            }
 //            cout<<endl;
 //        }
+//        cout<<endl;
 
         //if(rp.empty()) return er;
+
+//        for (int i = 0; i < rp.size(); i++)
+//        {
+//            for(int j = 0; j < rp.size(); j++)
+//            {
+//                if (j==i) continue;
+//                if( Isunit(gencofactor(vector < vector <bitset <2> > > (1,rp[j]), rp[i])[0]))
+//                {
+//                    rp.erase(rp.begin()+i);
+//                    i -= 1;
+//                    break;
+//                }
+//            }
+//        }
+
+
+//        for(int l = 0; l < rp.size(); l++)
+//        {
+//            for(int k = 0; k < rp[0].size(); k++)
+//            {
+//                cout<<rp[l][k]<<" ";
+//            }
+//            cout<<endl;
+//        }
+//        cout<<endl;
 
         vector < vector <bool> > cover (rp.size(), vector <bool> (rp.size(),0));
         vector < int > tracksum (rp.size(),0);
@@ -796,14 +886,50 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
         {
         //int i = 2;
             //temp.erase(temp.begin()+track[i]);
-
+            temp.erase(temp.begin() + store[i]);
             for(int j = 0; j < rp.size(); j++)
             {
-                if(!(gencofactor(vector < vector <bitset <2> > > (1,rp[j]), rp[i]).empty())) track2.push_back(j);
+                if(j == i)
+                {
+                    track2.push_back(i);
+                    continue;
+                }
+
+
+
+                if(j > i) temp.erase(temp.begin() + store[j] - 1);
+                else temp.erase(temp.begin() + store[j]);
+
+                if(!isTautology(gencofactor(temp,rp[i])))
+                {
+                    track2.push_back(j);
+                }
+                if(j > i) temp.insert(temp.begin() + store[j] - 1, rp[j]);
+                else temp.insert(temp.begin() + store[j], rp[j]);
+
+
+
+
+//                if(!(gencofactor(vector < vector <bitset <2> > > (1,rp[j]), rp[i]).empty()))
+//                {
+////                    if(Isunit(gencofactor(vector < vector <bitset <2> > > (1,rp[j]), rp[i])[0]))
+////                    {
+////                        rp.erase(rp.begin()+i);
+////                        i -= 1;
+////                        break;
+////                    }
+//
+//                    track2.push_back(j);
+//                }
+
+
+
             }
+            temp.insert(temp.begin() + store[i], rp[i]);
             //it = set_intersection(track.begin(), track.end(), track2.begin(), track2.end(), track2.begin());
             //track2.resize(it - track2.begin());
             // Need to resize again?
+
             for(int k = 0; k < track2.size(); k++)
             {
                 cover[i][track2[k]] = 1;
@@ -812,8 +938,24 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
             track2.clear();
         }
 
+        for(int i = 0; i < cover.size(); i++)
+        {
+            for(int j = 0; j < cover.size(); j++)
+            {
+                cout<<cover[i][j]<<" ";
+            }
+            cout<<endl;
+        }
+
+//        for(int h = 0; h < tracksum.size(); h++)
+//        {
+//            cout<<tracksum[h]<<" ";
+//        }
+//        cout<<endl;
+
         while(!cover.empty())
         {
+            //cout<<"here";
             it = max_element(tracksum.begin(), tracksum.end());
             er.push_back(rp[it-tracksum.begin()]);
 
@@ -821,6 +963,11 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
             {
                 if(cover[j][it - tracksum.begin()])
                 {
+                    for(int u = 0; u < cover[j].size(); u++)
+                    {
+                        if(cover[j][u]) tracksum[u] -= 1;
+                    }
+
                     cover.erase(cover.begin() + j);
                     j -= 1;
                 }
@@ -834,7 +981,7 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
 vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn, vector < vector < bitset<2> > > pcndc = vector < vector < bitset<2> > > ())
     {
         // Doesn't work for irredundant case CHECK!
-        // I repeat NO IRREDUNDANCY can be tolerated
+        // I repeat: NO IRREDUNDANCY can be tolerated
 
         vector < vector < bitset<2> > > t (pcn);
         if (!pcndc.empty()) t.insert(t.end(), pcndc.begin(), pcndc.end());
@@ -855,11 +1002,11 @@ vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn, vect
             sum.push_back(var1);
             var1 = 0;
         }
-        for(int i = 0; i < sum.size(); i++)
-        {
-            cout<<sum[i]<<" ";
-        }
-        cout<<endl;
+//        for(int i = 0; i < sum.size(); i++)
+//        {
+//            cout<<sum[i]<<" ";
+//        }
+//        cout<<endl;
 
 
         for(int i = 0; i < pcn.size(); i++)
@@ -871,11 +1018,11 @@ vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn, vect
             ord.push_back(var1);
             var1 = 0;
         }
-        for(int i = 0; i<ord.size(); i++)
-        {
-            cout<<ord[i]<<" ";
-        }
-        cout<<endl;
+//        for(int i = 0; i<ord.size(); i++)
+//        {
+//            cout<<ord[i]<<" ";
+//        }
+//        cout<<endl;
 
         int k;
         //for(int k = 0; k < pcn.size(); k++)
@@ -929,8 +1076,9 @@ vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn, vect
             pcn[k] = tmp;
             //cout<<"6";
             t.insert(t.begin()+k, tmp);
-            com.clear();
-            tmp.clear();
+            // Should this be done?
+            //com.clear();
+            //tmp.clear();
             it = max_element(ord.begin(),ord.end());
         }
 
@@ -954,12 +1102,16 @@ int main()
     //vector <bool> expr_2 (2,1);
     vector < bitset<2> > expr_1 (var, expr_2), gen;
     bitset <2> r (2);
-    gen.push_back(2);
-    gen.push_back(2);
+    //gen[0] = 1;
+    //gen[1] = 1;
+    gen.push_back(1);
+    gen.push_back(1);
     gen.push_back(3);
     //cout<<gen[2]<<endl;
     gen.push_back(3);
-    vector < vector < bitset<2> > > expr (cube, expr_1),ktest;
+    //gen.push_back(3);
+    //for(int h = 0;)
+    vector < vector < bitset<2> > > expr (cube, expr_1),ktest, gtest,ltest;
     vector < vector < bitset<2> > > test (1, expr_1);
     vector < vector < bitset<2> > > expr_bar;
     pair < bool, vector <int> > bas;
@@ -1022,21 +1174,9 @@ int main()
     //bas = isUnate(expr,1);
     //expr = gencofactor(expr,gen);
     //expr = consensus(expr, gen);
-    //expr = essentials(expr);
-    //ktest = expand(expr,expr_bar);
-    ktest = irredundant(expr, vector < vector < bitset <2> > > (1,gen));
+    ktest = expand(expr,expr_bar);
+    //ktest = essentials(expr);
 
-//    cout<<isTautology(expr);
-    for(int l = 0; l < ktest.size(); l++)
-    {
-        for(int k = 0; k < var; k++)
-        {
-            cout<<ktest[l][k]<<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-    ktest = reduce(ktest,vector < vector < bitset <2> > > (1,gen));
     for(int l = 0; l < ktest.size(); l++)
     {
         for(int k = 0; k < ktest[0].size(); k++)
@@ -1045,6 +1185,32 @@ int main()
         }
         cout<<endl;
     }
+
+    //ktest = irredundant(expr, vector < vector < bitset <2> > > (1,gen));
+    cout<<endl;
+    gtest = irredundant(ktest);
+    //gtest = gencofactor(ktest, gen);
+//    cout<<isTautology(expr);
+
+    for(int l = 0; l < gtest.size(); l++)
+    {
+        for(int k = 0; k < var; k++)
+        {
+            cout<<gtest[l][k]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
+
+//    ltest = reduce(gtest);
+//    for(int l = 0; l < ltest.size(); l++)
+//    {
+//        for(int k = 0; k < ltest[0].size(); k++)
+//        {
+//            cout<<ltest[l][k]<<" ";
+//        }
+//        cout<<endl;
+//    }
 
 //    cout<<r[1]+5;
 //    cout<<isTautology(expr)<<endl;
