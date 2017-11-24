@@ -464,6 +464,60 @@ vector < vector < bitset <2> > > unateRed (vector < vector < bitset <2> > > pcn)
         return unateRed(k);
 
     }
+//
+//vector <int> submodTautology (vector < vector <bitset <2> > > pcn, vector <int> store,int index, int depth = 0)
+//{
+//    if (depth == 0)
+//    {
+//        binate_priority(pcn);
+//        vector <int> track,track2;
+//        for(int i = 0; i < store.size(); i++)
+//        {
+//            if(store[i] > index) store[i] -= 1;
+//        }
+//    }
+//
+//    for(int i = 0; i < pcn.size(); i++)
+//    {
+//        if(Isunit(pcn[i]))
+//        {
+//            if(store.find(i) != store.end())
+//            {
+//                //Place the required rp index in track2
+//                track2.push_back(store.find(i) - store.begin());
+//                //Erase it from further computations
+//                pcn.erase(pcn.begin()+i);
+//                store.erase(store.find(i));
+//                for(int k = 0; k < store.size(); k++)
+//                {
+//                    if(store[k] > index) store[k] -= 1;
+//                }
+//
+//            }
+//            else return track;
+//        }
+//    }
+//}
+
+vector <int> modTautology (vector < vector < bitset <2> > > pcn, vector < bitset <2> > fac, vector <int> store, int index)
+{
+    if(pcn.empty()) return vector <int> ();
+    vector < vector <bitset <2> > > cof;
+    vector <int> track;
+    //track.push_back(store.find(index)-store.begin());
+
+    pcn.erase(pcn.begin()+index);
+    //store.erase(store.find(index));
+    cof = gencofactor(pcn,fac);
+
+
+
+
+
+    pcn.insert(pcn.begin()+index,fac);
+    return vector <int> ();
+}
+
 
 bool isTautology(vector < vector < bitset <2> > > pcn, int depth = 0)
 {
@@ -843,6 +897,7 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
             }
 
         }
+
 //        for(int l = 0; l < rp.size(); l++)
 //        {
 //            for(int k = 0; k < rp[0].size(); k++)
@@ -894,7 +949,6 @@ vector < vector < bitset<2> > > essentials (vector < vector < bitset<2> > > &pcn
                     track2.push_back(i);
                     continue;
                 }
-
 
 
                 if(j > i) temp.erase(temp.begin() + store[j] - 1);
@@ -1029,25 +1083,18 @@ vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn, vect
         it = max_element(ord.begin(),ord.end());
         while (*it != -1)
         {
+            //cout<<"here";
             //it = max_element(ord.begin(),ord.end());
             k = it - ord.begin();
             //ord.erase(it);
             *it = -1;
             //cout<<"0";
             tmp = t[k];
-            //cout<<"1";
+            //cout<<k<<endl;
             t.erase(t.begin()+k);
+            //cout<<"here";
             //cout<<"2";
             //cout<<endl;
-//            for(int f = 0; f < t.size(); f++)
-//            {
-//                for(int o = 0; o < var; o++)
-//                {
-//                    cout<<t[f][o]<<" ";
-//                }
-//                cout<<endl;
-//            }
-//            cout<<endl;
             com = complement(t);
             //cout<<"3";
 //            for(int h = 0; h<com.size(); h++)
@@ -1059,27 +1106,65 @@ vector < vector < bitset<2> > > reduce(vector < vector < bitset<2> > > pcn, vect
 //                cout<<endl;
 //            }
 //            cout<<endl;
+            //cout<<"here";
+            //cout<<"here";
             com = ANDl(com,pcn[k]);
-//            for(int h = 0; h<com.size(); h++)
+            for(int h = 0; h<com.size(); h++)
+            {
+                for(int j = 0; j < var; j++)
+                {
+                    cout<<com[h][j]<<" ";
+                }
+                cout<<endl;
+            }
+            cout<<endl;
+            //cout<<"4";
+            //cout<<"here";
+            tmp = ORb(com);
+            //cout<<"5";
+            //t = pcn;
+            //cout<<"here";
+//            for(int h = 0; h < tmp.size(); h++)
 //            {
-//                for(int j = 0; j < var; j++)
+//                cout<<tmp[h]<<" ";
+//            }
+//            cout<<endl;
+
+            if(tmp.empty())
+            {
+                pcn.erase(pcn.begin()+k);
+                ord.erase(ord.begin()+k);
+            }
+            else
+            {
+                pcn[k] = tmp;
+                t.insert(t.begin()+k, tmp);
+            }
+
+//            if(tmp.empty())
+//            {
+//                pcn.erase(pcn.begin()+k);
+//            }
+//
+
+            //cout<<"6";
+
+//            for(int f = 0; f < t.size(); f++)
+//            {
+//                for(int o = 0; o < var; o++)
 //                {
-//                    cout<<com[h][j]<<" ";
+//                    cout<<t[f][o]<<" ";
 //                }
 //                cout<<endl;
 //            }
 //            cout<<endl;
-            //cout<<"4";
-            tmp = ORb(com);
-            //cout<<"5";
-            //t = pcn;
-            pcn[k] = tmp;
-            //cout<<"6";
-            t.insert(t.begin()+k, tmp);
+
+            //cout<<"here";
             // Should this be done?
-            //com.clear();
+            com.clear();
             //tmp.clear();
             it = max_element(ord.begin(),ord.end());
+            //cout<<"here";
         }
 
         return pcn;
@@ -1202,15 +1287,15 @@ int main()
     }
     cout<<endl;
 
-//    ltest = reduce(gtest);
-//    for(int l = 0; l < ltest.size(); l++)
-//    {
-//        for(int k = 0; k < ltest[0].size(); k++)
-//        {
-//            cout<<ltest[l][k]<<" ";
-//        }
-//        cout<<endl;
-//    }
+    ltest = reduce(expr);
+    for(int l = 0; l < ltest.size(); l++)
+    {
+        for(int k = 0; k < ltest[0].size(); k++)
+        {
+            cout<<ltest[l][k]<<" ";
+        }
+        cout<<endl;
+    }
 
 //    cout<<r[1]+5;
 //    cout<<isTautology(expr)<<endl;
